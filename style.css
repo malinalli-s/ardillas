@@ -600,3 +600,102 @@ button {
 
   font-size: 2em;
 }
+
+/* =========================
+   ALERTA REGRESO
+========================= */
+
+#alertaRegreso {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 40;
+
+  padding: 8%;
+
+  display: none;
+
+  flex-direction: column;
+  justify-content: center;
+
+  background:
+    rgba(40, 5, 0, .88);
+
+  color: white;
+
+  pointer-events: none;
+}
+
+
+#alertaRegreso small {
+  letter-spacing: .2em;
+
+  opacity: .7;
+}
+
+
+#alertaRegreso h2 {
+  margin:
+    15px 0;
+
+  font-size:
+    clamp(
+      3rem,
+      14vw,
+      6rem
+    );
+
+  line-height: .85;
+}
+
+
+#alertaRegreso p {
+  font-size: 1rem;
+
+  letter-spacing: .15em;
+
+  line-height: 1.5;
+}
+
+
+/* =========================
+   CONTADOR DE REGRESO
+========================= */
+
+#cuentaRegreso {
+  position: absolute;
+
+  left: 50%;
+  top: 14%;
+
+  transform:
+    translateX(-50%);
+
+  z-index: 25;
+
+  display: none;
+
+  color: white;
+
+  text-align: center;
+
+  font-size: .6rem;
+
+  letter-spacing: .2em;
+
+  pointer-events: none;
+}
+
+
+#cuentaRegreso strong {
+  display: block;
+
+  margin-top: 4px;
+
+  font-size: 3.5rem;
+
+  line-height: 1;
+
+  letter-spacing: 0;
+}
