@@ -246,7 +246,62 @@ button {
       rgba(0,0,0,.5)
     );
 }
+/* =========================
+   ARDILLA ALCANZADA
+========================= */
 
+.ardilla.alcanzada {
+
+  /*
+  Ya no puede tocarse mientras
+  ocurre la desaparición.
+  */
+
+  pointer-events: none;
+
+  animation:
+    desaparecerArdilla
+    1.2s
+    ease-out
+    forwards;
+}
+
+
+@keyframes desaparecerArdilla {
+
+  0% {
+    opacity: 1;
+
+    filter:
+      brightness(1)
+      blur(0px);
+
+    scale: 1;
+  }
+
+
+  35% {
+    opacity: 1;
+
+    filter:
+      brightness(1.8)
+      blur(0px);
+
+    scale: 1.15;
+  }
+
+
+  100% {
+    opacity: 0;
+
+    filter:
+      brightness(.5)
+      blur(5px);
+
+    scale: .7;
+  }
+
+}
 
 /* =========================
    AGUA
