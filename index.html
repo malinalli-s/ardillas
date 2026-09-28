@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  >
+
+  <title>Rescate</title>
+
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<main id="juego">
+
+  <!-- BOSQUE -->
+
+  <div id="bosque">
+
+    <div class="arbol a1">♠</div>
+    <div class="arbol a2">♠</div>
+    <div class="arbol a3">♠</div>
+    <div class="arbol a4">♠</div>
+
+  </div>
+
+
+  <!-- OBJETOS DEL MUNDO -->
+
+  <div id="mundo">
+
+    <button class="ardilla">🐿️</button>
+    <button class="ardilla">🐿️</button>
+    <button class="ardilla">🐿️</button>
+    <button class="ardilla">🐿️</button>
+
+    <button class="ardilla">🐿️</button>
+    <button class="ardilla">🐿️</button>
+    <button class="ardilla">🐿️</button>
+    <button class="ardilla">🐿️</button>
+
+    <button id="agua">
+      ≋
+    </button>
+
+  </div>
+
+
+  <!-- FUEGO -->
+
+  <div id="fuego"></div>
+
+
+  <!-- INTERFAZ -->
+
+  <header id="ui">
+
+    <div>
+      SALVADAS
+      <strong id="salvadas">0</strong>
+    </div>
+
+    <div>
+      SIGUIENDO
+      <strong id="siguiendo">0</strong>
+    </div>
+
+  </header>
+
+
+  <!-- ARDILLAS QUE SIGUEN -->
+
+  <div id="grupo"></div>
+
+
+  <!-- MENSAJE -->
+
+  <div id="mensaje">
+    GIRA PARA BUSCAR
+  </div>
+
+
+  <!-- INICIO -->
+
+  <section id="inicio">
+
+    <small>
+      ARTE EN RESISTENCIA
+    </small>
+
+    <h1>
+      EL BOSQUE<br>
+      ESTÁ ARDIENDO
+    </h1>
+
+    <p>
+      Encuentra las ardillas.
+      Tócalas para que te sigan.
+      Llévalas al agua.
+    </p>
+
+    <button id="iniciar">
+      EMPEZAR
+    </button>
+
+  </section>
+
+
+  <!-- FINAL -->
+
+  <section id="final">
+
+    <small>
+      EL FUEGO LLEGÓ AL AGUA
+    </small>
+
+    <h2>
+      RESCATASTE
+      <strong id="resultado">0</strong>
+      ARDILLAS
+    </h2>
+
+    <button id="reiniciar">
+      VOLVER A INTENTAR
+    </button>
+
+  </section>
+
+</main>
+
+
+<script src="juego.js"></script>
+
+</body>
+</html>
