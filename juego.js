@@ -1,6 +1,8 @@
 /* =========================================
    ELEMENTOS DEL DOM
 ========================================= */
+const sonidoAgua =
+  document.querySelector("#sonidoAgua");
 
 const botonIniciar =
   document.querySelector("#iniciar");
@@ -400,6 +402,164 @@ function calibrar(evento) {
 
 }
 
+sonidoAgua.volume = 0;
+
+sonidoAgua.play()
+  .catch(error => {
+    console.log(
+      "Audio esperando interacción:",
+      error
+    );
+  });
+
+/* =========================================
+   SONIDO ESPACIAL DEL AGUA
+========================================= */
+
+function actualizarSonidoAgua() {
+
+  if (
+    !jugando ||
+    !sonidoAgua
+  ) {
+
+    return;
+  }
+
+
+  /*
+  Distancia horizontal entre
+  nuestra mirada y el agua.
+  */
+
+  const distanciaHorizontal =
+
+    Math.abs(
+
+      normalizarAngulo(
+
+        posicionAgua.horizontal -
+        horizontalActual
+
+      )
+
+    );
+
+
+  /*
+  También tomamos en cuenta
+  la distancia vertical.
+  */
+
+  const distanciaVertical =
+
+    Math.abs(
+
+      posicionAgua.vertical -
+      verticalActual
+
+    );
+
+
+  /*
+  Combinamos ambas.
+
+  La horizontal pesa más
+  porque la búsqueda principal
+  ocurre girando.
+  */
+
+  const distancia =
+
+    distanciaHorizontal +
+
+    distanciaVertical * 0.35;
+
+
+  /*
+  Sólo comenzamos a escuchar
+  el agua cuando estamos
+  relativamente cerca.
+
+  80° = silencio
+  0°  = volumen máximo
+  */
+
+  const rangoSonido =
+    80;
+
+
+  let cercania =
+
+    1 -
+    distancia /
+    rangoSonido;
+
+
+  /*
+  Limitamos entre 0 y 1.
+  */
+
+  cercania =
+
+    Math.max(
+      0,
+      Math.min(
+        1,
+        cercania
+      )
+    );
+
+
+  /*
+  Curva exponencial.
+
+  Esto hace que lejos se
+  escuche muy poco y cerca
+  aumente claramente.
+  */
+
+  const volumen =
+
+    Math.pow(
+      cercania,
+      2
+    );
+
+
+  /*
+  Durante exploración el agua
+  funciona como pista muy sutil.
+
+  Durante el regreso se escucha
+  considerablemente más.
+  */
+
+  if (
+    fase === "regreso"
+  ) {
+
+    sonidoAgua.volume =
+
+      Math.min(
+        volumen * 0.9,
+        0.9
+      );
+
+  }
+
+  else {
+
+    sonidoAgua.volume =
+
+      Math.min(
+        volumen * 0.25,
+        0.25
+      );
+
+  }
+
+}
 
 /* =========================================
    ORIENTACIÓN
@@ -447,6 +607,7 @@ function actualizarOrientacion(
   actualizarParallax();
 
   dibujarMundo();
+actualizarSonidoAgua();
 
 }
 
@@ -1829,7 +1990,17 @@ function terminarJuego() {
   fase =
     "final";
 
+/*
+  Detenemos agua.
+  */
 
+   if (sonidoAgua) {
+
+  sonidoAgua.volume = 0;
+
+  sonidoAgua.pause();
+
+}
   /*
   Detenemos contador.
   */
