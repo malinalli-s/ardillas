@@ -12,12 +12,9 @@ body {
 
   overflow: hidden;
 
-  background: #11160f;
+  background: #10150e;
 
-  font-family:
-    Arial,
-    Helvetica,
-    sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 button {
@@ -25,9 +22,9 @@ button {
 }
 
 
-/* ==========================
+/* =========================
    JUEGO
-========================== */
+========================= */
 
 #juego {
   position: relative;
@@ -37,68 +34,188 @@ button {
 
   overflow: hidden;
 
+  background: #27351d;
+}
+
+
+/* =========================
+   CIELO
+========================= */
+
+#cielo {
+  position: absolute;
+
+  inset: 0;
+
   background:
-    radial-gradient(
-      circle at 50% 60%,
-      #3b4b28,
-      #182014 70%
+    linear-gradient(
+      to bottom,
+      #88936b,
+      #53603f 50%,
+      #26301d
     );
 }
 
 
-/* ==========================
-   BOSQUE
-========================== */
+/* =========================
+   BOSQUE PARALLAX
+========================= */
 
-#bosque {
+.capaBosque {
   position: absolute;
-  inset: 0;
 
-  opacity: .65;
+  /*
+  Más ancho que la pantalla
+  para poder desplazarlo.
+  */
+
+  left: -30%;
+  width: 160%;
+
+  pointer-events: none;
+
+  will-change: transform;
+}
+
+
+/* árboles lejanos */
+
+#bosqueLejano {
+  bottom: 20%;
+
+  height: 55%;
+
+  opacity: .35;
 
   background:
 
     radial-gradient(
-      ellipse at 10% 90%,
-      #071006 0 12%,
+      ellipse at 10% 100%,
+      #152011 0 12%,
       transparent 13%
     ),
 
     radial-gradient(
-      ellipse at 35% 95%,
-      #0a1508 0 18%,
-      transparent 19%
+      ellipse at 25% 100%,
+      #152011 0 16%,
+      transparent 17%
     ),
 
     radial-gradient(
-      ellipse at 70% 90%,
-      #071006 0 17%,
+      ellipse at 45% 100%,
+      #152011 0 13%,
+      transparent 14%
+    ),
+
+    radial-gradient(
+      ellipse at 65% 100%,
+      #152011 0 17%,
       transparent 18%
     ),
 
     radial-gradient(
-      ellipse at 95% 95%,
-      #0a1508 0 20%,
-      transparent 21%
+      ellipse at 85% 100%,
+      #152011 0 15%,
+      transparent 16%
     );
 }
 
 
-/* ==========================
+/* árboles medios */
+
+#bosqueMedio {
+  bottom: 5%;
+
+  height: 65%;
+
+  opacity: .6;
+
+  background:
+
+    radial-gradient(
+      ellipse at 5% 100%,
+      #0e170b 0 14%,
+      transparent 15%
+    ),
+
+    radial-gradient(
+      ellipse at 22% 100%,
+      #0e170b 0 20%,
+      transparent 21%
+    ),
+
+    radial-gradient(
+      ellipse at 50% 100%,
+      #0e170b 0 16%,
+      transparent 17%
+    ),
+
+    radial-gradient(
+      ellipse at 72% 100%,
+      #0e170b 0 21%,
+      transparent 22%
+    ),
+
+    radial-gradient(
+      ellipse at 95% 100%,
+      #0e170b 0 17%,
+      transparent 18%
+    );
+}
+
+
+/* árboles cercanos */
+
+#bosqueCercano {
+  bottom: -12%;
+
+  height: 75%;
+
+  opacity: .8;
+
+  background:
+
+    radial-gradient(
+      ellipse at 0% 100%,
+      #071006 0 19%,
+      transparent 20%
+    ),
+
+    radial-gradient(
+      ellipse at 35% 100%,
+      #071006 0 24%,
+      transparent 25%
+    ),
+
+    radial-gradient(
+      ellipse at 70% 100%,
+      #071006 0 21%,
+      transparent 22%
+    ),
+
+    radial-gradient(
+      ellipse at 100% 100%,
+      #071006 0 25%,
+      transparent 26%
+    );
+}
+
+
+/* =========================
    MUNDO
-========================== */
+========================= */
 
 #mundo {
   position: absolute;
   inset: 0;
 
-  z-index: 3;
+  z-index: 5;
 }
 
 
-/* ==========================
+/* =========================
    ARDILLAS
-========================== */
+========================= */
 
 .ardilla {
   position: absolute;
@@ -106,20 +223,22 @@ button {
   left: 50%;
   top: 50%;
 
-  width: 74px;
-  height: 74px;
+  width: 76px;
+  height: 76px;
+
+  padding: 0;
 
   border: 0;
 
   background: transparent;
 
-  font-size: 3.3rem;
+  font-size: 3.2rem;
 
   cursor: pointer;
 
   touch-action: manipulation;
 
-  z-index: 5;
+  z-index: 8;
 
   filter:
     drop-shadow(
@@ -129,9 +248,9 @@ button {
 }
 
 
-/* ==========================
+/* =========================
    AGUA
-========================== */
+========================= */
 
 #agua {
   position: absolute;
@@ -139,18 +258,17 @@ button {
   left: 50%;
   top: 50%;
 
-  width: 140px;
-  height: 140px;
+  width: 145px;
+  height: 145px;
 
   border:
-
     2px solid
     rgba(255,255,255,.8);
 
   border-radius: 50%;
 
   background:
-    rgba(90,180,220,.22);
+    rgba(70,170,220,.28);
 
   color: white;
 
@@ -160,20 +278,17 @@ button {
 
   touch-action: manipulation;
 
-  z-index: 4;
-
-  backdrop-filter:
-    blur(4px);
+  z-index: 7;
 
   box-shadow:
-    0 0 40px
-    rgba(100,200,255,.2);
+    0 0 50px
+    rgba(80,190,255,.25);
 }
 
 
-/* ==========================
+/* =========================
    FUEGO
-========================== */
+========================= */
 
 .fuego {
   position: absolute;
@@ -181,19 +296,15 @@ button {
   left: 50%;
   top: 50%;
 
-  border: 0;
-
-  background: transparent;
-
   font-size: 3rem;
 
   pointer-events: none;
 
-  z-index: 6;
+  z-index: 9;
 
   animation:
     fuegoVivo
-    .45s
+    .5s
     infinite alternate;
 }
 
@@ -201,42 +312,36 @@ button {
 
   from {
     scale: .9;
-    filter:
-      blur(0px)
-      brightness(1);
   }
 
   to {
-    scale: 1.12;
-    filter:
-      blur(.5px)
-      brightness(1.3);
+    scale: 1.15;
   }
 
 }
 
 
-/* ==========================
+/* =========================
    HUMO
-========================== */
+========================= */
 
 #humo {
   position: absolute;
 
   inset: 0;
 
-  pointer-events: none;
+  z-index: 10;
 
-  z-index: 7;
+  pointer-events: none;
 
   opacity: 0;
 
   background:
 
     radial-gradient(
-      circle,
+      circle at center,
       transparent 20%,
-      rgba(30,30,25,.8)
+      rgba(30,30,25,.75)
     );
 
   transition:
@@ -244,9 +349,9 @@ button {
 }
 
 
-/* ==========================
+/* =========================
    UI
-========================== */
+========================= */
 
 #ui {
   position: absolute;
@@ -255,7 +360,7 @@ button {
   right: 6%;
   top: 5%;
 
-  z-index: 12;
+  z-index: 20;
 
   display: flex;
   justify-content: space-between;
@@ -283,9 +388,9 @@ button {
 }
 
 
-/* ==========================
-   ARDILLAS CONTIGO
-========================== */
+/* =========================
+   GRUPO
+========================= */
 
 #grupo {
   position: absolute;
@@ -298,7 +403,7 @@ button {
   transform:
     translateX(-50%);
 
-  z-index: 10;
+  z-index: 20;
 
   text-align: center;
 
@@ -308,9 +413,9 @@ button {
 }
 
 
-/* ==========================
+/* =========================
    MENSAJE
-========================== */
+========================= */
 
 #mensaje {
   position: absolute;
@@ -321,7 +426,7 @@ button {
   transform:
     translateX(-50%);
 
-  z-index: 12;
+  z-index: 20;
 
   color: white;
 
@@ -335,9 +440,9 @@ button {
 }
 
 
-/* ==========================
+/* =========================
    PANTALLAS
-========================== */
+========================= */
 
 #inicio,
 #final {
@@ -351,7 +456,6 @@ button {
 
   display: flex;
   flex-direction: column;
-
   justify-content: center;
 
   background: #10150e;
@@ -395,22 +499,18 @@ button {
   color: black;
 
   font-weight: bold;
-
-  cursor: pointer;
 }
 
 
-/* ==========================
+/* =========================
    FINAL
-========================== */
+========================= */
 
 #final {
   display: none;
 }
 
 #final h2 {
-  margin-bottom: 10px;
-
   font-size:
     clamp(2.2rem, 11vw, 5rem);
 
