@@ -19,46 +19,17 @@
 
 <main id="juego">
 
-  <!-- BOSQUE -->
+  <!-- FONDO -->
+  <div id="bosque"></div>
 
-  <div id="bosque">
+  <!-- ELEMENTOS QUE VIVEN EN EL MUNDO 360 -->
+  <div id="mundo"></div>
 
-    <div class="arbol a1">♠</div>
-    <div class="arbol a2">♠</div>
-    <div class="arbol a3">♠</div>
-    <div class="arbol a4">♠</div>
-
-  </div>
-
-
-  <!-- OBJETOS DEL MUNDO -->
-
-  <div id="mundo">
-
-    <button class="ardilla">🐿️</button>
-    <button class="ardilla">🐿️</button>
-    <button class="ardilla">🐿️</button>
-    <button class="ardilla">🐿️</button>
-
-    <button class="ardilla">🐿️</button>
-    <button class="ardilla">🐿️</button>
-    <button class="ardilla">🐿️</button>
-    <button class="ardilla">🐿️</button>
-
-    <button id="agua">
-      ≋
-    </button>
-
-  </div>
-
-
-  <!-- FUEGO -->
-
-  <div id="fuego"></div>
+  <!-- HUMO / DETERIORO GENERAL -->
+  <div id="humo"></div>
 
 
   <!-- INTERFAZ -->
-
   <header id="ui">
 
     <div>
@@ -67,27 +38,24 @@
     </div>
 
     <div>
-      SIGUIENDO
+      CONTIGO
       <strong id="siguiendo">0</strong>
     </div>
 
   </header>
 
 
-  <!-- ARDILLAS QUE SIGUEN -->
-
+  <!-- ARDILLAS QUE LLEVAS -->
   <div id="grupo"></div>
 
 
-  <!-- MENSAJE -->
-
+  <!-- MENSAJES -->
   <div id="mensaje">
     GIRA PARA BUSCAR
   </div>
 
 
   <!-- INICIO -->
-
   <section id="inicio">
 
     <small>
@@ -100,8 +68,8 @@
     </h1>
 
     <p>
-      Encuentra las ardillas.
-      Tócalas para que te sigan.
+      Gira para explorar.<br>
+      Toca las ardillas.<br>
       Llévalas al agua.
     </p>
 
@@ -113,18 +81,22 @@
 
 
   <!-- FINAL -->
-
   <section id="final">
 
     <small>
-      EL FUEGO LLEGÓ AL AGUA
+      EL INCENDIO CONTINUÓ
     </small>
 
     <h2>
-      RESCATASTE
+      LOGRASTE<br>
+      RESCATAR
       <strong id="resultado">0</strong>
       ARDILLAS
     </h2>
+
+    <p>
+      El bosque ya no puede recorrerse.
+    </p>
 
     <button id="reiniciar">
       VOLVER A INTENTAR
