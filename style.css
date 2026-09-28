@@ -1,5 +1,6 @@
 * {
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 html,
@@ -15,6 +16,7 @@ body {
 
   font-family:
     Arial,
+    Helvetica,
     sans-serif;
 }
 
@@ -23,9 +25,9 @@ button {
 }
 
 
-/* ======================
+/* ==========================
    JUEGO
-====================== */
+========================== */
 
 #juego {
   position: relative;
@@ -36,58 +38,67 @@ button {
   overflow: hidden;
 
   background:
-    linear-gradient(
-      #172016,
-      #27351d
+    radial-gradient(
+      circle at 50% 60%,
+      #3b4b28,
+      #182014 70%
     );
 }
 
 
-/* ======================
+/* ==========================
    BOSQUE
-====================== */
+========================== */
 
 #bosque {
   position: absolute;
   inset: 0;
+
+  opacity: .65;
+
+  background:
+
+    radial-gradient(
+      ellipse at 10% 90%,
+      #071006 0 12%,
+      transparent 13%
+    ),
+
+    radial-gradient(
+      ellipse at 35% 95%,
+      #0a1508 0 18%,
+      transparent 19%
+    ),
+
+    radial-gradient(
+      ellipse at 70% 90%,
+      #071006 0 17%,
+      transparent 18%
+    ),
+
+    radial-gradient(
+      ellipse at 95% 95%,
+      #0a1508 0 20%,
+      transparent 21%
+    );
 }
 
-.arbol {
+
+/* ==========================
+   MUNDO
+========================== */
+
+#mundo {
   position: absolute;
+  inset: 0;
 
-  color: #0a1008;
-
-  font-size: 45vh;
-
-  opacity: 0.35;
-
-  pointer-events: none;
-}
-
-.a1 {
-  left: -15%;
-  bottom: -10%;
-}
-
-.a2 {
-  left: 25%;
-  bottom: -20%;
-}
-
-.a3 {
-  right: 10%;
-  bottom: -5%;
-}
-
-.a4 {
-  right: -20%;
-  bottom: -20%;
+  z-index: 3;
 }
 
 
-/* ======================
+/* ==========================
    ARDILLAS
-====================== */
+========================== */
 
 .ardilla {
   position: absolute;
@@ -95,27 +106,32 @@ button {
   left: 50%;
   top: 50%;
 
-  width: 70px;
-  height: 70px;
+  width: 74px;
+  height: 74px;
 
   border: 0;
 
   background: transparent;
 
-  font-size: 3rem;
+  font-size: 3.3rem;
 
-  transform:
-    translate(-50%, -50%);
+  cursor: pointer;
+
+  touch-action: manipulation;
 
   z-index: 5;
 
-  cursor: pointer;
+  filter:
+    drop-shadow(
+      0 5px 7px
+      rgba(0,0,0,.5)
+    );
 }
 
 
-/* ======================
+/* ==========================
    AGUA
-====================== */
+========================== */
 
 #agua {
   position: absolute;
@@ -123,67 +139,114 @@ button {
   left: 50%;
   top: 50%;
 
-  width: 130px;
-  height: 130px;
+  width: 140px;
+  height: 140px;
 
   border:
 
     2px solid
-    rgba(255,255,255,.7);
+    rgba(255,255,255,.8);
 
   border-radius: 50%;
 
   background:
-    rgba(120,190,220,.25);
+    rgba(90,180,220,.22);
 
   color: white;
 
   font-size: 5rem;
 
-  transform:
-    translate(-50%, -50%);
+  cursor: pointer;
+
+  touch-action: manipulation;
 
   z-index: 4;
+
+  backdrop-filter:
+    blur(4px);
+
+  box-shadow:
+    0 0 40px
+    rgba(100,200,255,.2);
 }
 
 
-/* ======================
+/* ==========================
    FUEGO
-====================== */
+========================== */
 
-#fuego {
+.fuego {
   position: absolute;
 
-  left: 0;
-  right: 0;
-  bottom: 0;
+  left: 50%;
+  top: 50%;
 
-  height: 0%;
+  border: 0;
+
+  background: transparent;
+
+  font-size: 3rem;
 
   pointer-events: none;
 
   z-index: 6;
 
-  background:
+  animation:
+    fuegoVivo
+    .45s
+    infinite alternate;
+}
 
-    linear-gradient(
-      to top,
+@keyframes fuegoVivo {
 
-      rgba(255,70,0,.95),
+  from {
+    scale: .9;
+    filter:
+      blur(0px)
+      brightness(1);
+  }
 
-      rgba(255,120,0,.55),
+  to {
+    scale: 1.12;
+    filter:
+      blur(.5px)
+      brightness(1.3);
+  }
 
-      rgba(20,20,20,0)
-    );
-
-  transition:
-    height .3s linear;
 }
 
 
-/* ======================
+/* ==========================
+   HUMO
+========================== */
+
+#humo {
+  position: absolute;
+
+  inset: 0;
+
+  pointer-events: none;
+
+  z-index: 7;
+
+  opacity: 0;
+
+  background:
+
+    radial-gradient(
+      circle,
+      transparent 20%,
+      rgba(30,30,25,.8)
+    );
+
+  transition:
+    opacity 2s linear;
+}
+
+
+/* ==========================
    UI
-====================== */
+========================== */
 
 #ui {
   position: absolute;
@@ -192,16 +255,18 @@ button {
   right: 6%;
   top: 5%;
 
+  z-index: 12;
+
   display: flex;
   justify-content: space-between;
 
-  z-index: 10;
-
   color: white;
 
-  font-size: .65rem;
+  font-size: .6rem;
 
-  letter-spacing: .15em;
+  letter-spacing: .18em;
+
+  pointer-events: none;
 }
 
 #ui div {
@@ -210,15 +275,17 @@ button {
 }
 
 #ui strong {
-  margin-top: 4px;
+  margin-top: 5px;
 
-  font-size: 1.5rem;
+  font-size: 1.7rem;
+
+  letter-spacing: 0;
 }
 
 
-/* ======================
-   GRUPO
-====================== */
+/* ==========================
+   ARDILLAS CONTIGO
+========================== */
 
 #grupo {
   position: absolute;
@@ -226,22 +293,24 @@ button {
   left: 50%;
   bottom: 9%;
 
+  width: 90%;
+
   transform:
     translateX(-50%);
 
-  z-index: 8;
-
-  max-width: 80%;
+  z-index: 10;
 
   text-align: center;
 
   font-size: 2rem;
+
+  pointer-events: none;
 }
 
 
-/* ======================
+/* ==========================
    MENSAJE
-====================== */
+========================== */
 
 #mensaje {
   position: absolute;
@@ -252,7 +321,7 @@ button {
   transform:
     translateX(-50%);
 
-  z-index: 10;
+  z-index: 12;
 
   color: white;
 
@@ -261,12 +330,14 @@ button {
   letter-spacing: .2em;
 
   white-space: nowrap;
+
+  pointer-events: none;
 }
 
 
-/* ======================
+/* ==========================
    PANTALLAS
-====================== */
+========================== */
 
 #inicio,
 #final {
@@ -274,7 +345,7 @@ button {
 
   inset: 0;
 
-  z-index: 20;
+  z-index: 30;
 
   padding: 8%;
 
@@ -302,9 +373,8 @@ button {
   line-height: .85;
 }
 
-#inicio p {
-  max-width: 320px;
-
+#inicio p,
+#final p {
   line-height: 1.5;
 }
 
@@ -325,22 +395,24 @@ button {
   color: black;
 
   font-weight: bold;
+
+  cursor: pointer;
 }
 
 
-/* ======================
+/* ==========================
    FINAL
-====================== */
+========================== */
 
 #final {
   display: none;
 }
 
 #final h2 {
-  max-width: 500px;
+  margin-bottom: 10px;
 
   font-size:
-    clamp(2.5rem, 12vw, 5rem);
+    clamp(2.2rem, 11vw, 5rem);
 
   line-height: .9;
 }
@@ -348,5 +420,7 @@ button {
 #final h2 strong {
   display: block;
 
-  font-size: 1.8em;
+  margin: 10px 0;
+
+  font-size: 2em;
 }
