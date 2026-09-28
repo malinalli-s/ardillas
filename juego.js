@@ -476,7 +476,7 @@ function crearArdilla() {
 
     vertical:
   elegirAltura(),
-      ),
+      
 
     siguiendo: false,
 
