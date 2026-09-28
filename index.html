@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
   <meta charset="UTF-8">
 
@@ -19,17 +18,31 @@
 
 <main id="juego">
 
-  <!-- FONDO -->
-  <div id="bosque"></div>
+  <!-- CIELO -->
+  <div id="cielo"></div>
 
-  <!-- ELEMENTOS QUE VIVEN EN EL MUNDO 360 -->
+  <!--
+    BOSQUE EN PROFUNDIDAD
+
+    Cada capa reaccionará diferente
+    al movimiento del teléfono.
+  -->
+
+  <div id="bosqueLejano" class="capaBosque"></div>
+  <div id="bosqueMedio" class="capaBosque"></div>
+  <div id="bosqueCercano" class="capaBosque"></div>
+
+
+  <!-- MUNDO INTERACTIVO -->
   <div id="mundo"></div>
 
-  <!-- HUMO / DETERIORO GENERAL -->
+
+  <!-- HUMO -->
   <div id="humo"></div>
 
 
   <!-- INTERFAZ -->
+
   <header id="ui">
 
     <div>
@@ -45,17 +58,20 @@
   </header>
 
 
-  <!-- ARDILLAS QUE LLEVAS -->
+  <!-- ARDILLAS QUE TE SIGUEN -->
+
   <div id="grupo"></div>
 
 
-  <!-- MENSAJES -->
+  <!-- MENSAJE -->
+
   <div id="mensaje">
     GIRA PARA BUSCAR
   </div>
 
 
   <!-- INICIO -->
+
   <section id="inicio">
 
     <small>
@@ -81,6 +97,7 @@
 
 
   <!-- FINAL -->
+
   <section id="final">
 
     <small>
@@ -88,9 +105,12 @@
     </small>
 
     <h2>
-      LOGRASTE<br>
-      RESCATAR
-      <strong id="resultado">0</strong>
+      LOGRASTE RESCATAR
+
+      <strong id="resultado">
+        0
+      </strong>
+
       ARDILLAS
     </h2>
 
