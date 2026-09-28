@@ -136,7 +136,7 @@ const campoHorizontal =
   75;
 
 const campoVertical =
-  90;
+  60;
 
 
 /* =========================================
@@ -182,7 +182,7 @@ const posicionAgua = {
 
   horizontal: 30,
 
-  vertical: 15
+  vertical: 35
 
 };
 
@@ -350,9 +350,7 @@ function actualizarOrientacion(
 
 
   verticalActual =
-
-    (evento.beta || 0)
-    - betaOrigen;
+  ((evento.beta || 0) - betaOrigen) * 1.5;
 
 
   actualizarParallax();
@@ -477,9 +475,7 @@ function crearArdilla() {
       ),
 
     vertical:
-      numeroAleatorio(
-        -32,
-        32
+  elegirAltura(),
       ),
 
     siguiendo: false,
@@ -871,8 +867,8 @@ function crearFuego() {
 
     vertical:
       numeroAleatorio(
-        -35,
-        35
+        -65,
+        65
       )
 
   };
@@ -1576,6 +1572,47 @@ function numeroAleatorio(
     * (maximo - minimo)
     + minimo
 
+  );
+
+}
+
+function elegirAltura() {
+
+  const zona =
+    Math.floor(
+      Math.random() * 3
+    );
+
+
+  /* ARRIBA */
+
+  if (zona === 0) {
+
+    return numeroAleatorio(
+      -65,
+      -30
+    );
+
+  }
+
+
+  /* CENTRO */
+
+  if (zona === 1) {
+
+    return numeroAleatorio(
+      -20,
+      20
+    );
+
+  }
+
+
+  /* ABAJO */
+
+  return numeroAleatorio(
+    30,
+    65
   );
 
 }
