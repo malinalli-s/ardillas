@@ -1,5 +1,5 @@
 /* =========================================
-   DOM
+   ELEMENTOS DEL DOM
 ========================================= */
 
 const botonIniciar =
@@ -39,7 +39,9 @@ const resultado =
   document.querySelector("#resultado");
 
 
-/* REGRESO */
+/* =========================================
+   REGRESO FINAL
+========================================= */
 
 const alertaRegreso =
   document.querySelector("#alertaRegreso");
@@ -51,7 +53,9 @@ const segundosRegreso =
   document.querySelector("#segundosRegreso");
 
 
-/* PARALLAX */
+/* =========================================
+   CAPAS PARALLAX
+========================================= */
 
 const bosqueLejano =
   document.querySelector("#bosqueLejano");
@@ -67,7 +71,7 @@ const cielo =
 
 
 /* =========================================
-   ESTADO
+   ESTADO GENERAL
 ========================================= */
 
 let jugando = false;
@@ -85,6 +89,8 @@ let fase =
   "exploracion";
 
 
+/* orientación */
+
 let alphaOrigen = 0;
 let betaOrigen = 0;
 
@@ -92,9 +98,13 @@ let horizontalActual = 0;
 let verticalActual = 0;
 
 
+/* resultados */
+
 let salvadas = 0;
 let perdidas = 0;
 
+
+/* objetos del mundo */
 
 let ardillas = [];
 let fuegos = [];
@@ -104,19 +114,30 @@ let fuegos = [];
    CONFIGURACIÓN
 ========================================= */
 
+
+/*
+Cantidad mínima de ardillas
+libres en el bosque.
+
+Cuando recoges o pierdes una,
+el sistema genera otra.
+*/
+
 const minimoArdillas =
   12;
 
+
+/*
+Tiempo entre nuevas llamas.
+*/
 
 const intervaloFuego =
   3200;
 
 
 /*
-Ya no termina directamente
-al llegar al máximo.
-
-Aquí comienza el regreso.
+Cuando existen 20 focos
+comienza la fase de regreso.
 */
 
 const fuegosParaRegresar =
@@ -124,13 +145,21 @@ const fuegosParaRegresar =
 
 
 /*
-Segundos disponibles
-para encontrar el agua.
+Tiempo para encontrar
+el agua al final.
 */
 
 const tiempoParaRegresar =
   10;
 
+
+/*
+Campo visual.
+
+Un valor vertical menor
+hace más sensible el
+movimiento arriba/abajo.
+*/
 
 const campoHorizontal =
   75;
@@ -139,18 +168,27 @@ const campoVertical =
   60;
 
 
+/*
+Sensibilidad vertical.
+*/
+
+const sensibilidadVertical =
+  1.5;
+
+
 /* =========================================
    TEMPORIZADORES
 ========================================= */
 
-let temporizadorRegreso = null;
+let temporizadorRegreso =
+  null;
 
 let segundosRestantes =
   tiempoParaRegresar;
 
 
 /* =========================================
-   AGUA
+   CREAR AGUA
 ========================================= */
 
 const agua =
@@ -178,6 +216,17 @@ mundo.appendChild(
 );
 
 
+/*
+Posición del agua.
+
+Horizontal:
+-180 a 180
+
+Vertical:
+negativo = arriba
+positivo = abajo
+*/
+
 const posicionAgua = {
 
   horizontal: 30,
@@ -188,7 +237,7 @@ const posicionAgua = {
 
 
 /* =========================================
-   INICIAR
+   BOTÓN EMPEZAR
 ========================================= */
 
 botonIniciar.addEventListener(
@@ -198,6 +247,12 @@ botonIniciar.addEventListener(
 
 
 async function iniciarJuego() {
+
+  /*
+  En iPhone/iPad necesitamos
+  pedir permiso para utilizar
+  DeviceOrientation.
+  */
 
   if (
 
@@ -235,7 +290,10 @@ async function iniciarJuego() {
 
     catch (error) {
 
-      console.error(error);
+      console.error(
+        "Error al solicitar orientación:",
+        error
+      );
 
       return;
 
@@ -243,6 +301,11 @@ async function iniciarJuego() {
 
   }
 
+
+  /*
+  El primer dato del sensor
+  sirve como punto cero.
+  */
 
   window.addEventListener(
     "deviceorientation",
@@ -283,12 +346,18 @@ function calibrar(evento) {
     "exploracion";
 
 
+  /*
+  Ocultamos la nueva
+  pantalla ilustrada.
+  */
+
   pantallaInicio.style.display =
     "none";
 
 
   /*
-  Ardillas iniciales.
+  Creamos las primeras
+  ardillas.
   */
 
   for (
@@ -302,6 +371,11 @@ function calibrar(evento) {
   }
 
 
+  /*
+  Comenzamos a escuchar
+  el sensor.
+  */
+
   window.addEventListener(
     "deviceorientation",
     actualizarOrientacion
@@ -313,8 +387,7 @@ function calibrar(evento) {
 
 
   /*
-  El fuego comienza
-  después de unos segundos.
+  Primer fuego.
   */
 
   setTimeout(
@@ -339,6 +412,10 @@ function actualizarOrientacion(
   if (!jugando) return;
 
 
+  /*
+  GIRO HORIZONTAL
+  */
+
   horizontalActual =
 
     normalizarAngulo(
@@ -349,8 +426,22 @@ function actualizarOrientacion(
     );
 
 
+  /*
+  MOVIMIENTO VERTICAL
+
+  Amplificamos beta para
+  hacer perceptible mirar
+  arriba y abajo.
+  */
+
   verticalActual =
-  ((evento.beta || 0) - betaOrigen) * 1.5;
+
+    (
+      (evento.beta || 0)
+      - betaOrigen
+    )
+
+    * sensibilidadVertical;
 
 
   actualizarParallax();
@@ -366,6 +457,11 @@ function actualizarOrientacion(
 
 function actualizarParallax() {
 
+  /*
+  Cuanto más cerca está
+  una capa, más se desplaza.
+  */
+
   const lejanoX =
     horizontalActual * -0.25;
 
@@ -377,6 +473,10 @@ function actualizarParallax() {
   const cercanoX =
     horizontalActual * -1.25;
 
+
+  /*
+  Parallax vertical.
+  */
 
   const lejanoY =
     verticalActual * -0.08;
@@ -390,34 +490,46 @@ function actualizarParallax() {
     verticalActual * -0.25;
 
 
-  bosqueLejano.style.transform = `
+  if (bosqueLejano) {
 
-    translate(
-      ${lejanoX}px,
-      ${lejanoY}px
-    )
+    bosqueLejano.style.transform = `
 
-  `;
+      translate(
+        ${lejanoX}px,
+        ${lejanoY}px
+      )
 
+    `;
 
-  bosqueMedio.style.transform = `
-
-    translate(
-      ${medioX}px,
-      ${medioY}px
-    )
-
-  `;
+  }
 
 
-  bosqueCercano.style.transform = `
+  if (bosqueMedio) {
 
-    translate(
-      ${cercanoX}px,
-      ${cercanoY}px
-    )
+    bosqueMedio.style.transform = `
 
-  `;
+      translate(
+        ${medioX}px,
+        ${medioY}px
+      )
+
+    `;
+
+  }
+
+
+  if (bosqueCercano) {
+
+    bosqueCercano.style.transform = `
+
+      translate(
+        ${cercanoX}px,
+        ${cercanoY}px
+      )
+
+    `;
+
+  }
 
 }
 
@@ -427,6 +539,11 @@ function actualizarParallax() {
 ========================================= */
 
 function crearArdilla() {
+
+  /*
+  Durante el regreso
+  ya no aparecen nuevas.
+  */
 
   if (
     !jugando ||
@@ -468,26 +585,49 @@ function crearArdilla() {
 
     elemento,
 
+
+    /*
+    Distribución completa
+    alrededor del jugador.
+    */
+
     horizontal:
       numeroAleatorio(
         -180,
         180
       ),
 
+
+    /*
+    La altura ya NO es
+    simplemente aleatoria.
+
+    Forzamos arriba,
+    centro o abajo.
+    */
+
     vertical:
-  elegirAltura(),
-      
+      elegirAltura(),
 
-    siguiendo: false,
 
-    salvada: false,
+    siguiendo:
+      false,
 
-    perdida: false,
+    salvada:
+      false,
 
-    desapareciendo: false
+    perdida:
+      false,
+
+    desapareciendo:
+      false
 
   };
 
+
+  /*
+  Tap en la ardilla.
+  */
 
   elemento.addEventListener(
     "click",
@@ -520,6 +660,68 @@ function crearArdilla() {
 
 
 /* =========================================
+   ELEGIR ALTURA
+========================================= */
+
+function elegirAltura() {
+
+  /*
+  Elegimos una de
+  tres franjas.
+  */
+
+  const zona =
+
+    Math.floor(
+      Math.random() * 3
+    );
+
+
+  /*
+  ARRIBA
+  */
+
+  if (
+    zona === 0
+  ) {
+
+    return numeroAleatorio(
+      -65,
+      -30
+    );
+
+  }
+
+
+  /*
+  CENTRO
+  */
+
+  if (
+    zona === 1
+  ) {
+
+    return numeroAleatorio(
+      -20,
+      20
+    );
+
+  }
+
+
+  /*
+  ABAJO
+  */
+
+  return numeroAleatorio(
+    30,
+    65
+  );
+
+}
+
+
+/* =========================================
    RECOGER ARDILLA
 ========================================= */
 
@@ -528,8 +730,9 @@ function recogerArdilla(
 ) {
 
   /*
-  Durante la fase de regreso
-  ya no podemos recoger más.
+  Durante el regreso
+  ya no podemos recoger
+  nuevas ardillas.
   */
 
   if (
@@ -553,9 +756,19 @@ function recogerArdilla(
   }
 
 
+  /*
+  La ardilla ahora
+  sigue al jugador.
+  */
+
   ardilla.siguiendo =
     true;
 
+
+  /*
+  Desaparece del espacio
+  porque está contigo.
+  */
 
   ardilla.elemento.style.display =
     "none";
@@ -563,6 +776,11 @@ function recogerArdilla(
 
   actualizarGrupo();
 
+
+  /*
+  Generamos otra ardilla
+  en algún lugar del mundo.
+  */
 
   reponerArdillas();
 
@@ -640,6 +858,11 @@ function reponerArdillas() {
     );
 
 
+  /*
+  Creamos exactamente
+  las necesarias.
+  */
+
   for (
     let i = 0;
     i < faltantes;
@@ -654,7 +877,7 @@ function reponerArdillas() {
 
 
 /* =========================================
-   GRUPO
+   ACTUALIZAR GRUPO
 ========================================= */
 
 function actualizarGrupo() {
@@ -671,6 +894,11 @@ function actualizarGrupo() {
     siguiendo.length;
 
 
+  /*
+  Mostramos hasta ocho
+  ardillas abajo.
+  */
+
   const visibles =
 
     Math.min(
@@ -685,6 +913,11 @@ function actualizarGrupo() {
       visibles
     );
 
+
+  /*
+  Si llevamos muchas,
+  usamos un contador.
+  */
 
   if (
     siguiendo.length > 8
@@ -722,9 +955,9 @@ function llegarAlAgua() {
     );
 
 
-  /*
-  EXPLORACIÓN NORMAL
-  */
+  /* =====================================
+     DURANTE EXPLORACIÓN
+  ===================================== */
 
   if (
     fase === "exploracion"
@@ -742,6 +975,10 @@ function llegarAlAgua() {
     }
 
 
+    const cantidad =
+      siguiendo.length;
+
+
     rescatarGrupo(
       siguiendo
     );
@@ -749,7 +986,7 @@ function llegarAlAgua() {
 
     mensaje.textContent =
 
-      `${siguiendo.length} A SALVO`;
+      `${cantidad} A SALVO`;
 
 
     reponerArdillas();
@@ -759,9 +996,9 @@ function llegarAlAgua() {
   }
 
 
-  /*
-  REGRESO FINAL
-  */
+  /* =====================================
+     DURANTE REGRESO FINAL
+  ===================================== */
 
   if (
     fase === "regreso"
@@ -826,8 +1063,11 @@ function rescatarGrupo(
 function crearFuego() {
 
   if (
+
     !jugando ||
+
     fase !== "exploracion"
+
   ) {
 
     return;
@@ -859,17 +1099,27 @@ function crearFuego() {
 
     elemento,
 
+
+    /*
+    El fuego también puede
+    aparecer alrededor de
+    todo el jugador.
+    */
+
     horizontal:
       numeroAleatorio(
         -180,
         180
       ),
 
+
+    /*
+    También distribuimos
+    el fuego verticalmente.
+    */
+
     vertical:
-      numeroAleatorio(
-        -65,
-        65
-      )
+      elegirAltura()
 
   };
 
@@ -891,7 +1141,7 @@ function crearFuego() {
 
 
   /*
-  Ambiente.
+  PROGRESO DEL INCENDIO
   */
 
   const progreso =
@@ -900,20 +1150,31 @@ function crearFuego() {
     fuegosParaRegresar;
 
 
+  /*
+  Más incendio =
+  más humo.
+  */
+
   humo.style.opacity =
 
     Math.min(
-      progreso * .6,
-      .6
+      progreso * 0.6,
+      0.6
     );
 
+
+  /*
+  El ambiente se vuelve
+  progresivamente más cálido
+  y oscuro.
+  */
 
   if (cielo) {
 
     cielo.style.filter = `
 
-      sepia(${progreso * .8})
-      brightness(${1 - progreso * .35})
+      sepia(${progreso * 0.8})
+      brightness(${1 - progreso * 0.35})
 
     `;
 
@@ -921,15 +1182,16 @@ function crearFuego() {
 
 
   /*
-  Revisamos contactos.
+  Revisamos inmediatamente
+  si alguna ardilla fue
+  alcanzada.
   */
 
   revisarColisiones();
 
 
   /*
-  Hemos llegado al punto
-  crítico del incendio.
+  INCENDIO CRÍTICO
   */
 
   if (
@@ -945,6 +1207,10 @@ function crearFuego() {
 
   }
 
+
+  /*
+  Próxima llama.
+  */
 
   setTimeout(
     crearFuego,
@@ -967,6 +1233,12 @@ function revisarColisiones() {
     ardilla => {
 
 
+      /*
+      No revisamos ardillas
+      que ya están protegidas
+      o eliminadas.
+      */
+
       if (
 
         ardilla.siguiendo ||
@@ -988,6 +1260,11 @@ function revisarColisiones() {
         fuego => {
 
 
+          /*
+          Distancia horizontal
+          dentro del mundo 360°.
+          */
+
           const distanciaX =
 
             Math.abs(
@@ -1002,6 +1279,10 @@ function revisarColisiones() {
             );
 
 
+          /*
+          Distancia vertical.
+          */
+
           const distanciaY =
 
             Math.abs(
@@ -1011,6 +1292,10 @@ function revisarColisiones() {
 
             );
 
+
+          /*
+          Contacto.
+          */
 
           if (
 
@@ -1043,6 +1328,10 @@ function alcanzarArdilla(
   ardilla
 ) {
 
+  /*
+  Evitamos dobles conteos.
+  */
+
   if (
 
     ardilla.perdida ||
@@ -1060,13 +1349,14 @@ function alcanzarArdilla(
   }
 
 
+  /*
+  Inmediatamente bloqueamos
+  la ardilla.
+  */
+
   ardilla.desapareciendo =
     true;
 
-
-  /*
-  Ya no puede rescatarse.
-  */
 
   ardilla.elemento.style
     .pointerEvents =
@@ -1074,8 +1364,15 @@ function alcanzarArdilla(
 
 
   /*
-  Primero se vuelve roja
-  y posteriormente desaparece.
+  Esta clase CSS hace:
+
+  normal
+      ↓
+  roja
+      ↓
+  fade
+      ↓
+  desaparece
   */
 
   ardilla.elemento.classList.add(
@@ -1084,12 +1381,17 @@ function alcanzarArdilla(
 
 
   /*
-  1.5 segundos coincide
-  con la animación CSS.
+  IMPORTANTE:
+
+  Este tiempo debe coincidir
+  con la animación CSS:
+
+  1.5s
   */
 
   setTimeout(
     () => {
+
 
       ardilla.perdida =
         true;
@@ -1102,21 +1404,35 @@ function alcanzarArdilla(
       ardilla.elemento.remove();
 
 
+      /*
+      Contador de pérdidas.
+      */
+
       perdidas++;
 
 
-      textoPerdidas.textContent =
-        perdidas;
+      if (
+        textoPerdidas
+      ) {
+
+        textoPerdidas.textContent =
+          perdidas;
+
+      }
 
 
       /*
-      Sólo reponemos durante
-      la exploración.
+      Mientras podamos seguir
+      explorando, aparece
+      otra ardilla.
       */
 
       if (
+
         jugando &&
+
         fase === "exploracion"
+
       ) {
 
         reponerArdillas();
@@ -1138,8 +1454,11 @@ function alcanzarArdilla(
 function iniciarRegreso() {
 
   if (
+
     !jugando ||
+
     fase !== "exploracion"
+
   ) {
 
     return;
@@ -1152,14 +1471,16 @@ function iniciarRegreso() {
 
 
   /*
-  Ya no aparecen más fuegos
-  ni más ardillas.
+  Dejamos de generar
+  nuevos elementos.
+
+  El jugador ahora sólo
+  debe encontrar el agua.
   */
 
 
   /*
-  Primero mostramos
-  el mensaje grande.
+  Aviso grande.
   */
 
   alertaRegreso.style.display =
@@ -1171,16 +1492,19 @@ function iniciarRegreso() {
 
 
   /*
-  Lo dejamos visible
-  durante 2 segundos.
+  Dejamos el aviso visible
+  dos segundos.
   */
 
   setTimeout(
     () => {
 
       if (
+
         !jugando ||
+
         fase !== "regreso"
+
       ) {
 
         return;
@@ -1203,7 +1527,7 @@ function iniciarRegreso() {
 
 
 /* =========================================
-   CUENTA REGRESIVA
+   CUENTA PARA ENCONTRAR EL AGUA
 ========================================= */
 
 function comenzarCuentaRegreso() {
@@ -1238,8 +1562,7 @@ function comenzarCuentaRegreso() {
 
 
         /*
-        Los últimos segundos
-        pueden sentirse más urgentes.
+        Últimos tres segundos.
         */
 
         if (
@@ -1257,7 +1580,7 @@ function comenzarCuentaRegreso() {
 
 
         /*
-        No llegó al agua.
+        Se acabó el tiempo.
         */
 
         if (
@@ -1290,9 +1613,9 @@ function dibujarMundo() {
   if (!jugando) return;
 
 
-  /*
-  ARDILLAS
-  */
+  /* =====================================
+     ARDILLAS
+  ===================================== */
 
   ardillas.forEach(
     ardilla => {
@@ -1327,9 +1650,9 @@ function dibujarMundo() {
   );
 
 
-  /*
-  FUEGO
-  */
+  /* =====================================
+     FUEGOS
+  ===================================== */
 
   fuegos.forEach(
     fuego => {
@@ -1348,9 +1671,9 @@ function dibujarMundo() {
   );
 
 
-  /*
-  AGUA
-  */
+  /* =====================================
+     AGUA
+  ===================================== */
 
   posicionarElemento(
 
@@ -1363,13 +1686,17 @@ function dibujarMundo() {
   );
 
 
+  /*
+  Comprobamos encuentros.
+  */
+
   revisarColisiones();
 
 }
 
 
 /* =========================================
-   POSICIONAR ELEMENTO
+   POSICIONAR ELEMENTO EN 360°
 ========================================= */
 
 function posicionarElemento(
@@ -1390,6 +1717,11 @@ function posicionarElemento(
     window.innerHeight;
 
 
+  /*
+  Distancia horizontal entre
+  nuestra mirada y el objeto.
+  */
+
   let diferenciaX =
 
     posicionHorizontal -
@@ -1403,11 +1735,20 @@ function posicionarElemento(
     );
 
 
+  /*
+  Distancia vertical.
+  */
+
   const diferenciaY =
 
     posicionVertical -
     verticalActual;
 
+
+  /*
+  Convertimos grados
+  a posición de pantalla.
+  */
 
   const x =
 
@@ -1423,16 +1764,24 @@ function posicionarElemento(
     alto;
 
 
+  /*
+  Campo visible.
+  */
+
   const visible =
 
     Math.abs(x)
-      < ancho * .62
+      < ancho * 0.62
 
     &&
 
     Math.abs(y)
-      < alto * .60;
+      < alto * 0.60;
 
+
+  /*
+  Fuera de nuestra mirada.
+  */
 
   if (!visible) {
 
@@ -1443,6 +1792,10 @@ function posicionarElemento(
 
   }
 
+
+  /*
+  Dentro de nuestra mirada.
+  */
 
   elemento.style.display =
     "block";
@@ -1461,7 +1814,7 @@ function posicionarElemento(
 
 
 /* =========================================
-   FINAL
+   TERMINAR
 ========================================= */
 
 function terminarJuego() {
@@ -1477,6 +1830,10 @@ function terminarJuego() {
     "final";
 
 
+  /*
+  Detenemos contador.
+  */
+
   if (
     temporizadorRegreso
   ) {
@@ -1488,19 +1845,45 @@ function terminarJuego() {
   }
 
 
-  cuentaRegreso.style.display =
-    "none";
+  /*
+  Ocultamos elementos
+  de la fase de regreso.
+  */
+
+  if (
+    cuentaRegreso
+  ) {
+
+    cuentaRegreso.style.display =
+      "none";
+
+  }
 
 
-  alertaRegreso.style.display =
-    "none";
+  if (
+    alertaRegreso
+  ) {
 
+    alertaRegreso.style.display =
+      "none";
+
+  }
+
+
+  /*
+  Ya no necesitamos
+  leer el sensor.
+  */
 
   window.removeEventListener(
     "deviceorientation",
     actualizarOrientacion
   );
 
+
+  /*
+  Resultado.
+  */
 
   resultado.textContent =
     salvadas;
@@ -1534,6 +1917,14 @@ function normalizarAngulo(
   angulo
 ) {
 
+  /*
+  Ejemplos:
+
+  350° → -10°
+  190° → -170°
+  -200° → 160°
+  */
+
   while (
     angulo > 180
   ) {
@@ -1558,7 +1949,7 @@ function normalizarAngulo(
 
 
 /* =========================================
-   ALEATORIO
+   NÚMERO ALEATORIO
 ========================================= */
 
 function numeroAleatorio(
@@ -1572,47 +1963,6 @@ function numeroAleatorio(
     * (maximo - minimo)
     + minimo
 
-  );
-
-}
-
-function elegirAltura() {
-
-  const zona =
-    Math.floor(
-      Math.random() * 3
-    );
-
-
-  /* ARRIBA */
-
-  if (zona === 0) {
-
-    return numeroAleatorio(
-      -65,
-      -30
-    );
-
-  }
-
-
-  /* CENTRO */
-
-  if (zona === 1) {
-
-    return numeroAleatorio(
-      -20,
-      20
-    );
-
-  }
-
-
-  /* ABAJO */
-
-  return numeroAleatorio(
-    30,
-    65
   );
 
 }
