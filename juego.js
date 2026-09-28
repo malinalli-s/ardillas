@@ -14,8 +14,17 @@ const pantallaInicio =
 const pantallaFinal =
   document.querySelector("#final");
 
-const resultado =
-  document.querySelector("#resultado");
+const mundo =
+  document.querySelector("#mundo");
+
+const humo =
+  document.querySelector("#humo");
+
+const mensaje =
+  document.querySelector("#mensaje");
+
+const grupo =
+  document.querySelector("#grupo");
 
 const textoSalvadas =
   document.querySelector("#salvadas");
@@ -23,94 +32,91 @@ const textoSalvadas =
 const textoSiguiendo =
   document.querySelector("#siguiendo");
 
-const grupo =
-  document.querySelector("#grupo");
-
-const mensaje =
-  document.querySelector("#mensaje");
-
-const fuego =
-  document.querySelector("#fuego");
-
-const agua =
-  document.querySelector("#agua");
-
-const elementosArdillas =
-  document.querySelectorAll(".ardilla");
-
-
-/* ==========================================
-   MUNDO
-========================================== */
-
-const ardillas = [
-
-  { angulo: -150, vertical: -15 },
-  { angulo: -105, vertical: 20 },
-  { angulo: -65,  vertical: -25 },
-  { angulo: -20,  vertical: 15 },
-
-  { angulo: 35,   vertical: -20 },
-  { angulo: 80,   vertical: 25 },
-  { angulo: 130,  vertical: -10 },
-  { angulo: 170,  vertical: 18 }
-
-];
-
-
-ardillas.forEach(
-  (ardilla, indice) => {
-
-    ardilla.elemento =
-      elementosArdillas[indice];
-
-    ardilla.siguiendo =
-      false;
-
-    ardilla.salvada =
-      false;
-
-  }
-);
-
-
-/*
-El agua también vive
-en el mundo de 360°.
-*/
-
-const posicionAgua = {
-
-  angulo: 10,
-  vertical: 5
-
-};
+const resultado =
+  document.querySelector("#resultado");
 
 
 /* ==========================================
    ESTADO
 ========================================== */
 
+let jugando = false;
+
 let alphaOrigen = 0;
 let betaOrigen = 0;
 
-let jugando = false;
+let horizontalActual = 0;
+let verticalActual = 0;
 
-let numeroSiguiendo = 0;
-let numeroSalvadas = 0;
+let salvadas = 0;
+
+let ardillas = [];
+let fuegos = [];
+
+let contadorArdillas = 0;
+
+
+/* ==========================================
+   CONFIGURACIÓN
+========================================== */
+
+/*
+Queremos que siempre parezca
+que existen más ardillas.
+*/
+
+const minimoArdillas = 10;
 
 
 /*
-El incendio durará
-75 segundos.
+Cada cuánto aparece fuego.
+Menor número = más difícil.
 */
 
-const duracionIncendio =
-  75000;
+const intervaloFuego = 3500;
 
 
-let inicioIncendio = 0;
-let animacion;
+/*
+Número de focos de fuego
+antes del final.
+*/
+
+const maximoFuegos = 24;
+
+
+/*
+Cada cuánto comprobamos
+si necesitamos nuevas ardillas.
+*/
+
+const intervaloArdillas = 2500;
+
+
+/* ==========================================
+   AGUA
+========================================== */
+
+const agua = document.createElement(
+  "button"
+);
+
+agua.id = "agua";
+agua.innerHTML = "≋";
+
+mundo.appendChild(agua);
+
+
+/*
+El agua está fija en una
+dirección del mundo.
+*/
+
+const posicionAgua = {
+
+  horizontal: 20,
+  vertical: 10
+
+};
 
 
 /* ==========================================
@@ -126,8 +132,8 @@ botonIniciar.addEventListener(
 async function iniciarJuego() {
 
   /*
-  iPhone necesita permiso
-  explícito para orientación.
+  Permiso necesario
+  principalmente en iPhone.
   */
 
   if (
@@ -171,11 +177,6 @@ async function iniciarJuego() {
   }
 
 
-  /*
-  Tomamos la primera posición
-  como origen.
-  */
-
   window.addEventListener(
     "deviceorientation",
     calibrar,
@@ -186,7 +187,7 @@ async function iniciarJuego() {
 
 
 /* ==========================================
-   CALIBRAR
+   CALIBRACIÓN
 ========================================== */
 
 function calibrar(evento) {
@@ -202,12 +203,23 @@ function calibrar(evento) {
     "none";
 
 
-  jugando =
-    true;
+  jugando = true;
 
 
-  inicioIncendio =
-    performance.now();
+  /*
+  Generamos las primeras
+  ardillas.
+  */
+
+  for (
+    let i = 0;
+    i < minimoArdillas;
+    i++
+  ) {
+
+    crearArdilla();
+
+  }
 
 
   window.addEventListener(
@@ -216,11 +228,24 @@ function calibrar(evento) {
   );
 
 
-  mensaje.textContent =
-    "GIRA PARA BUSCAR";
+  /*
+  El incendio empieza
+  poco después.
+  */
+
+  setTimeout(
+    crearFuego,
+    4000
+  );
 
 
-  actualizarFuego();
+  setInterval(
+    mantenerArdillas,
+    intervaloArdillas
+  );
+
+
+  dibujarMundo();
 
 }
 
@@ -229,255 +254,122 @@ function calibrar(evento) {
    ORIENTACIÓN
 ========================================== */
 
-function actualizarOrientacion(evento) {
+function actualizarOrientacion(
+  evento
+) {
 
   if (!jugando) return;
 
 
-  let horizontal =
+  horizontalActual =
 
-    (evento.alpha || 0)
-
-    - alphaOrigen;
-
-
-  horizontal =
     normalizarAngulo(
-      horizontal
+
+      (evento.alpha || 0)
+      - alphaOrigen
+
     );
 
 
-  const vertical =
+  verticalActual =
 
     (evento.beta || 0)
-
     - betaOrigen;
 
 
-  dibujarMundo(
-    horizontal,
-    vertical
-  );
+  dibujarMundo();
 
 }
 
 
 /* ==========================================
-   DIBUJAR MUNDO
+   CREAR ARDILLA
 ========================================== */
 
-function dibujarMundo(
-  horizontal,
-  vertical
-) {
+function crearArdilla() {
 
-  const ancho =
-    window.innerWidth;
-
-  const alto =
-    window.innerHeight;
+  if (!jugando) return;
 
 
-  const campoHorizontal =
-    70;
-
-  const campoVertical =
-    90;
-
-
-  /* =========================
-     ARDILLAS
-  ========================= */
-
-  ardillas.forEach(
-    ardilla => {
-
-
-      if (
-        ardilla.siguiendo ||
-        ardilla.salvada
-      ) {
-
-        ardilla.elemento.style.display =
-          "none";
-
-        return;
-
-      }
-
-
-      let diferenciaX =
-
-        ardilla.angulo -
-        horizontal;
-
-
-      diferenciaX =
-        normalizarAngulo(
-          diferenciaX
-        );
-
-
-      const diferenciaY =
-
-        ardilla.vertical -
-        vertical;
-
-
-      const x =
-
-        diferenciaX /
-        campoHorizontal
-
-        * ancho;
-
-
-      const y =
-
-        diferenciaY /
-        campoVertical
-
-        * alto;
-
-
-      const visible =
-
-        Math.abs(x)
-          < ancho * 0.58
-
-        &&
-
-        Math.abs(y)
-          < alto * 0.55;
-
-
-      if (!visible) {
-
-        ardilla.elemento.style.display =
-          "none";
-
-        return;
-
-      }
-
-
-      ardilla.elemento.style.display =
-        "block";
-
-
-      ardilla.elemento.style.transform = `
-
-        translate(
-          calc(-50% + ${x}px),
-          calc(-50% + ${y}px)
-        )
-
-      `;
-
-    }
-  );
-
-
-  /* =========================
-     AGUA
-  ========================= */
-
-  let diferenciaAguaX =
-
-    posicionAgua.angulo -
-    horizontal;
-
-
-  diferenciaAguaX =
-    normalizarAngulo(
-      diferenciaAguaX
+  const elemento =
+    document.createElement(
+      "button"
     );
 
 
-  const diferenciaAguaY =
-
-    posicionAgua.vertical -
-    vertical;
+  elemento.className =
+    "ardilla";
 
 
-  const aguaX =
-
-    diferenciaAguaX /
-    campoHorizontal
-
-    * ancho;
+  elemento.innerHTML =
+    "🐿️";
 
 
-  const aguaY =
-
-    diferenciaAguaY /
-    campoVertical
-
-    * alto;
+  mundo.appendChild(
+    elemento
+  );
 
 
-  const aguaVisible =
+  const ardilla = {
 
-    Math.abs(aguaX)
-      < ancho * .65
+    id:
+      contadorArdillas++,
 
-    &&
+    elemento,
 
-    Math.abs(aguaY)
-      < alto * .6;
+    horizontal:
+      numeroAleatorio(
+        -180,
+        180
+      ),
+
+    vertical:
+      numeroAleatorio(
+        -35,
+        35
+      ),
+
+    siguiendo:
+      false,
+
+    salvada:
+      false,
+
+    perdida:
+      false
+
+  };
 
 
-  if (aguaVisible) {
-
-    agua.style.display =
-      "block";
-
-
-    agua.style.transform = `
-
-      translate(
-        calc(-50% + ${aguaX}px),
-        calc(-50% + ${aguaY}px)
+  elemento.addEventListener(
+    "click",
+    () =>
+      recogerArdilla(
+        ardilla
       )
+  );
 
-    `;
 
-  }
-
-  else {
-
-    agua.style.display =
-      "none";
-
-  }
+  ardillas.push(
+    ardilla
+  );
 
 }
 
 
 /* ==========================================
-   TAP EN ARDILLA
+   RECOGER ARDILLA
 ========================================== */
 
-ardillas.forEach(
-  ardilla => {
-
-    ardilla.elemento.addEventListener(
-      "click",
-      () => seleccionarArdilla(ardilla)
-    );
-
-  }
-);
-
-
-function seleccionarArdilla(
+function recogerArdilla(
   ardilla
 ) {
 
   if (
     !jugando ||
     ardilla.siguiendo ||
-    ardilla.salvada
+    ardilla.salvada ||
+    ardilla.perdida
   ) {
 
     return;
@@ -489,9 +381,6 @@ function seleccionarArdilla(
     true;
 
 
-  numeroSiguiendo++;
-
-
   ardilla.elemento.style.display =
     "none";
 
@@ -500,31 +389,60 @@ function seleccionarArdilla(
 
 
   mensaje.textContent =
-    "AHORA LLÉVALA AL AGUA";
+    "TE SIGUE";
+
+
+  /*
+  Poco después dejamos
+  de mostrar el mensaje.
+  */
+
+  setTimeout(
+    () => {
+
+      if (jugando) {
+
+        mensaje.textContent =
+          "¿UNA MÁS?";
+
+      }
+
+    },
+    900
+  );
 
 }
 
 
 /* ==========================================
-   ARDILLAS SIGUIENDO
+   GRUPO
 ========================================== */
 
 function actualizarGrupo() {
 
+  const siguiendo =
+
+    ardillas.filter(
+      ardilla =>
+        ardilla.siguiendo
+    );
+
+
   textoSiguiendo.textContent =
-    numeroSiguiendo;
+    siguiendo.length;
 
 
   grupo.textContent =
+
     "🐿️".repeat(
-      numeroSiguiendo
+      siguiendo.length
     );
 
 }
 
 
 /* ==========================================
-   AGUA
+   RESCATAR EN EL AGUA
 ========================================== */
 
 agua.addEventListener(
@@ -535,29 +453,295 @@ agua.addEventListener(
 
 function rescatar() {
 
+  if (!jugando) return;
+
+
+  const siguiendo =
+
+    ardillas.filter(
+      ardilla =>
+        ardilla.siguiendo
+    );
+
+
   if (
-    !jugando ||
-    numeroSiguiendo === 0
+    siguiendo.length === 0
   ) {
 
     mensaje.textContent =
-      "ENCUENTRA ARDILLAS";
+      "BUSCA ARDILLAS";
 
     return;
 
   }
 
 
+  siguiendo.forEach(
+    ardilla => {
+
+      ardilla.siguiendo =
+        false;
+
+      ardilla.salvada =
+        true;
+
+    }
+  );
+
+
+  salvadas +=
+    siguiendo.length;
+
+
+  textoSalvadas.textContent =
+    salvadas;
+
+
+  actualizarGrupo();
+
+
+  mensaje.textContent =
+    `${siguiendo.length} A SALVO`;
+
+
+  /*
+  Inmediatamente hacemos
+  aparecer nuevas posibilidades.
+  */
+
+  mantenerArdillas();
+
+}
+
+
+/* ==========================================
+   MANTENER ARDILLAS
+========================================== */
+
+function mantenerArdillas() {
+
+  if (!jugando) return;
+
+
+  const disponibles =
+
+    ardillas.filter(
+      ardilla =>
+
+        !ardilla.siguiendo &&
+        !ardilla.salvada &&
+        !ardilla.perdida
+
+    );
+
+
+  /*
+  Siempre mantenemos muchas
+  posibilidades alrededor.
+  */
+
+  while (
+    disponibles.length +
+    contarNuevasPendientes()
+    < minimoArdillas
+  ) {
+
+    crearArdilla();
+
+  }
+
+}
+
+
+/*
+Esta función queda simple
+porque crearArdilla es inmediato.
+*/
+
+function contarNuevasPendientes() {
+
+  return 0;
+
+}
+
+
+/* ==========================================
+   CREAR FUEGO
+========================================== */
+
+function crearFuego() {
+
+  if (!jugando) return;
+
+
+  const elemento =
+    document.createElement(
+      "div"
+    );
+
+
+  elemento.className =
+    "fuego";
+
+
+  elemento.innerHTML =
+    "🔥";
+
+
+  mundo.appendChild(
+    elemento
+  );
+
+
+  const fuego = {
+
+    elemento,
+
+    horizontal:
+      numeroAleatorio(
+        -180,
+        180
+      ),
+
+    vertical:
+      numeroAleatorio(
+        -40,
+        40
+      )
+
+  };
+
+
+  fuegos.push(
+    fuego
+  );
+
+
+  /*
+  Cada nuevo fuego aumenta
+  ligeramente el humo.
+  */
+
+  humo.style.opacity =
+
+    Math.min(
+      fuegos.length /
+      maximoFuegos * .65,
+      .65
+    );
+
+
+  /*
+  Revisamos si alguna ardilla
+  estaba cerca del nuevo fuego.
+  */
+
+  revisarArdillasEnPeligro(
+    fuego
+  );
+
+
+  /*
+  Final.
+  */
+
+  if (
+    fuegos.length >=
+    maximoFuegos
+  ) {
+
+    terminarJuego();
+
+    return;
+
+  }
+
+
+  /*
+  Próximo foco.
+  */
+
+  setTimeout(
+    crearFuego,
+    intervaloFuego
+  );
+
+
+  dibujarMundo();
+
+}
+
+
+/* ==========================================
+   ARDILLAS EN PELIGRO
+========================================== */
+
+function revisarArdillasEnPeligro(
+  fuego
+) {
+
   ardillas.forEach(
     ardilla => {
 
-      if (ardilla.siguiendo) {
 
-        ardilla.siguiendo =
-          false;
+      /*
+      Las que ya te siguen
+      no desaparecen.
+      Las estás transportando.
+      */
 
-        ardilla.salvada =
+      if (
+        ardilla.siguiendo ||
+        ardilla.salvada ||
+        ardilla.perdida
+      ) {
+
+        return;
+
+      }
+
+
+      const distanciaHorizontal =
+
+        Math.abs(
+
+          normalizarAngulo(
+
+            ardilla.horizontal -
+            fuego.horizontal
+
+          )
+
+        );
+
+
+      const distanciaVertical =
+
+        Math.abs(
+
+          ardilla.vertical -
+          fuego.vertical
+
+        );
+
+
+      /*
+      Si aparece fuego muy
+      cerca de una ardilla,
+      deja de estar disponible.
+      */
+
+      if (
+        distanciaHorizontal < 18 &&
+        distanciaVertical < 18
+      ) {
+
+        ardilla.perdida =
           true;
+
+
+        ardilla.elemento
+          .remove();
 
       }
 
@@ -565,110 +749,218 @@ function rescatar() {
   );
 
 
-  numeroSalvadas +=
-    numeroSiguiendo;
-
-
-  numeroSiguiendo =
-    0;
-
-
-  textoSalvadas.textContent =
-    numeroSalvadas;
-
-
-  actualizarGrupo();
-
-
-  mensaje.textContent =
-    "ESTÁN A SALVO";
-
-
-  /*
-  Si encontramos todas,
-  terminamos antes.
-  */
-
-  if (
-    numeroSalvadas ===
-    ardillas.length
-  ) {
-
-    terminarJuego();
-
-  }
+  mantenerArdillas();
 
 }
 
 
 /* ==========================================
-   FUEGO
+   DIBUJAR TODO
 ========================================== */
 
-function actualizarFuego() {
+function dibujarMundo() {
 
   if (!jugando) return;
 
 
-  const ahora =
-    performance.now();
+  const ancho =
+    window.innerWidth;
+
+  const alto =
+    window.innerHeight;
 
 
-  const transcurrido =
+  const campoHorizontal =
+    75;
 
-    ahora -
-    inicioIncendio;
+  const campoVertical =
+    90;
 
 
-  const progreso =
+  /* =====================
+     ARDILLAS
+  ===================== */
 
-    Math.min(
+  ardillas.forEach(
+    ardilla => {
 
-      transcurrido /
-      duracionIncendio,
 
-      1
+      if (
+        ardilla.siguiendo ||
+        ardilla.salvada ||
+        ardilla.perdida
+      ) {
 
+        return;
+
+      }
+
+
+      posicionarElemento(
+
+        ardilla.elemento,
+
+        ardilla.horizontal,
+
+        ardilla.vertical,
+
+        ancho,
+
+        alto,
+
+        campoHorizontal,
+
+        campoVertical
+
+      );
+
+    }
+  );
+
+
+  /* =====================
+     FUEGOS
+  ===================== */
+
+  fuegos.forEach(
+    fuego => {
+
+      posicionarElemento(
+
+        fuego.elemento,
+
+        fuego.horizontal,
+
+        fuego.vertical,
+
+        ancho,
+
+        alto,
+
+        campoHorizontal,
+
+        campoVertical
+
+      );
+
+    }
+  );
+
+
+  /* =====================
+     AGUA
+  ===================== */
+
+  posicionarElemento(
+
+    agua,
+
+    posicionAgua.horizontal,
+
+    posicionAgua.vertical,
+
+    ancho,
+
+    alto,
+
+    campoHorizontal,
+
+    campoVertical
+
+  );
+
+}
+
+
+/* ==========================================
+   POSICIONAR OBJETO 360
+========================================== */
+
+function posicionarElemento(
+
+  elemento,
+
+  posicionHorizontal,
+
+  posicionVertical,
+
+  ancho,
+
+  alto,
+
+  campoHorizontal,
+
+  campoVertical
+
+) {
+
+  let diferenciaX =
+
+    posicionHorizontal -
+    horizontalActual;
+
+
+  diferenciaX =
+    normalizarAngulo(
+      diferenciaX
     );
 
 
-  /*
-  El fuego sube visualmente.
-  */
+  const diferenciaY =
 
-  fuego.style.height =
-
-    `${progreso * 100}%`;
+    posicionVertical -
+    verticalActual;
 
 
-  /*
-  Avisos simples.
-  */
+  const x =
 
-  if (
-    progreso > .75 &&
-    numeroSiguiendo > 0
-  ) {
+    diferenciaX /
+    campoHorizontal
 
-    mensaje.textContent =
-      "REGRESA AL AGUA";
-
-  }
+    * ancho;
 
 
-  if (progreso >= 1) {
+  const y =
 
-    terminarJuego();
+    diferenciaY /
+    campoVertical
+
+    * alto;
+
+
+  const visible =
+
+    Math.abs(x)
+      < ancho * .62
+
+    &&
+
+    Math.abs(y)
+      < alto * .60;
+
+
+  if (!visible) {
+
+    elemento.style.display =
+      "none";
 
     return;
 
   }
 
 
-  animacion =
-    requestAnimationFrame(
-      actualizarFuego
-    );
+  elemento.style.display =
+    "block";
+
+
+  elemento.style.transform = `
+
+    translate(
+      calc(-50% + ${x}px),
+      calc(-50% + ${y}px)
+    )
+
+  `;
 
 }
 
@@ -679,20 +971,11 @@ function actualizarFuego() {
 
 function terminarJuego() {
 
-  if (!jugando) return;
-
-
-  jugando =
-    false;
-
-
-  cancelAnimationFrame(
-    animacion
-  );
+  jugando = false;
 
 
   resultado.textContent =
-    numeroSalvadas;
+    salvadas;
 
 
   pantallaFinal.style.display =
@@ -716,21 +999,25 @@ botonReiniciar.addEventListener(
 
 
 /* ==========================================
-   UTILIDAD
+   UTILIDADES
 ========================================== */
 
 function normalizarAngulo(
   angulo
 ) {
 
-  while (angulo > 180) {
+  while (
+    angulo > 180
+  ) {
 
     angulo -= 360;
 
   }
 
 
-  while (angulo < -180) {
+  while (
+    angulo < -180
+  ) {
 
     angulo += 360;
 
@@ -738,5 +1025,21 @@ function normalizarAngulo(
 
 
   return angulo;
+
+}
+
+
+function numeroAleatorio(
+  minimo,
+  maximo
+) {
+
+  return (
+
+    Math.random()
+    * (maximo - minimo)
+    + minimo
+
+  );
 
 }
